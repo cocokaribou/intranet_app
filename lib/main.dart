@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'services/api_service.dart'; // Adjust path if necessary
+import 'package:intranet_app/screens/HomeScreen.dart';
+import 'services/api_service.dart';
 
-void main() {
-  runApp(MyApp());
-  // testLogin();
-}
+
+void main() => runApp(MyApp());
 
 login(id, pwd) async {
   ApiService apiService = ApiService();
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(title: const Text('Login Form')), body: LoginForm()),
+          appBar: AppBar(title: const Text('Login Form')), body: const LoginForm()),
     );
   }
 }
@@ -34,14 +33,24 @@ class _LoginFormState extends State<LoginForm> {
   String _username = '';
   String _password = '';
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Logging in...')),
       );
-      var result = login(_username, _password);
-      print(result);
+      var result = await login(_username, _password); // Ensure login() is async and waits for the result
+      if (result != null) { // Assuming result is null on failure, adjust based on your login logic
+        // Navigate to the HomeScreen if login is successful
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      } else {
+        // Handle login failure (e.g., show an error message)
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed')),
+        );
+      }
     }
   }
 
